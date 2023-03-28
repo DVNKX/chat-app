@@ -1,12 +1,15 @@
 export enum Routes {
   WALKTHROUGH = 'Walkthrough',
-  SIGNIN = 'SignIn',
-  SIGNUP = 'SignUp',
+  SIGN_IN = 'SignIn',
+  SIGN_UP = 'SignUp',
   CONTACTS = 'Contacts',
-  PROFILEACCOUNT = 'ProfileAccount',
-  CHATS = 'Chats',
+  PROFILE_ACCOUNT = 'ProfileAccount',
 
   TABS = 'Tabs',
+  CHATS = 'Chats',
   CHAT = 'Chat',
   MORE = 'More',
+
+  SEARCH_USER = 'SearchUser',
+  CHANGE_AVATAR = 'ChangeAvatar',
 }

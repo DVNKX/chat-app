@@ -6,7 +6,10 @@ export const authSchema = Yup.object().shape({
     .email('Invalid email format'),
   password: Yup.string()
     .required('Password is a required field')
-    .min(8, 'Password must be at least 8 characters'),
+    .min(8, 'Password is too short - should be 8 chars minimum.')
+    .matches(/[a-zA-Z]/, 'Password can only contain Latin letters.')
+    .matches(/[a-z]+/, 'Password must contain lowercase character')
+    .matches(/\d+/, 'Password must contain number'),
 });
 
 export const profileSchema = Yup.object().shape({

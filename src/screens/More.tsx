@@ -6,35 +6,34 @@ import {Routes} from '../utils/routes';
 import {useNavigation} from '@react-navigation/native';
 import {useCallback} from 'react';
 import {auth} from '../firebase/firebase';
-import {UIOptions} from '../Components/UIOptions';
+import {UIOptions} from '../сomponents/UIOptions';
+import {uploadUserOnlineStatus} from '../services/userManagement';
+import {useAppSelector} from '../hooks/redux';
 
 export const More = () => {
   const navigation = useNavigation<NavigationProps>();
 
   const handleClickToProfile = useCallback(() => {
-    navigation.navigate(Routes.PROFILEACCOUNT);
-  }, []);
+    navigation.navigate(Routes.PROFILE_ACCOUNT);
+  }, [navigation]);
 
   const handleClickToContacts = useCallback(() => {
     navigation.navigate(Routes.CONTACTS);
-  }, []);
+  }, [navigation]);
 
   const handleClickToChats = useCallback(() => {
     navigation.navigate(Routes.CHATS);
-  }, []);
+  }, [navigation]);
 
-  const handleClickToSignOut = useCallback(() => {
+  const handleClickToSignOut = useCallback(async () => {
+    await uploadUserOnlineStatus(auth.currentUser!.uid, false);
+    await auth.signOut().catch(e => {
+      Alert.alert(e);
+    });
     navigation.navigate(Routes.WALKTHROUGH);
-  }, []);
+  }, [navigation]);
 
-  const signOut = useCallback(() => {
-    auth
-      .signOut()
-      .then(handleClickToSignOut)
-      .catch(e => {
-        Alert.alert(e);
-      });
-  }, []);
+  const {name, surname} = useAppSelector(state => state.user);
 
   return (
     <View style={styles.container}>
@@ -56,10 +55,12 @@ export const More = () => {
               <View style={styles.userData}>
                 <View style={styles.namePos}>
                   <Text style={styles.text}>
-                    Name {auth.currentUser!.displayName}
+                    {name === null
+                      ? auth.currentUser?.displayName
+                      : name + ' ' + surname}
                   </Text>
                 </View>
-                <Text style={styles.userEmail}>{auth.currentUser!.email}</Text>
+                <Text style={styles.userEmail}>{auth.currentUser?.email}</Text>
               </View>
               <View style={styles.chevronPos}>
                 <Image style={styles.chevron} source={ASSETS.chevronRight} />
@@ -86,7 +87,7 @@ export const More = () => {
           <UIOptions icon={ASSETS.data} text={'Data Usage'} />
         </View>
         <View style={styles.borderPos}>
-          <View style={styles.border}></View>
+          <View style={styles.border} />
         </View>
         <View style={styles.tabsContent}>
           <UIOptions icon={ASSETS.help} text={'Help'} />
@@ -94,7 +95,7 @@ export const More = () => {
           <UIOptions
             icon={ASSETS.signOut}
             text={'Sign Out'}
-            navigate={signOut}
+            navigate={handleClickToSignOut}
           />
         </View>
       </View>

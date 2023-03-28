@@ -24,4 +24,6 @@ export const ASSETS = {
   blob: require('../pictures/blob.webp'),
   send: require('../pictures/send.png'),
   signOut: require('../pictures/sign-out.png'),
+  viewPasswor: require('../pictures/view-password.png'),
+  hidePassword: require('../pictures/hide-password.png'),
 };

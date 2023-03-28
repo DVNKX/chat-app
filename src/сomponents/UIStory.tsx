@@ -8,41 +8,43 @@ interface IStoryProps {
   isViewed: boolean;
 }
 
-export const UIStory: React.FC<IStoryProps> = props => {
-  return (
-    <TouchableOpacity style={styles.story}>
-      {props.isViewed ? (
-        <View>
-          <View style={styles.userStory}>
-            <View style={styles.avatarPos}>
-              <View style={styles.userAvatarPos}>
-                <Image style={styles.usersAvatar} source={props.avatar} />
-              </View>
+export const UIStory: React.FC<IStoryProps> = ({
+  avatar,
+  userName,
+  isViewed,
+}) => (
+  <TouchableOpacity style={styles.story}>
+    {isViewed ? (
+      <View>
+        <View style={styles.userStory}>
+          <View style={styles.avatarPos}>
+            <View style={styles.userAvatarPos}>
+              <Image style={styles.usersAvatar} source={avatar} />
             </View>
           </View>
         </View>
-      ) : (
-        <LinearGradient
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 0}}
-          locations={[0, 0.7]}
-          colors={['#D2D5F9', '#2C37E1']}
-          style={styles.usersStory}>
-          <View style={styles.avatarPos}>
-            <View style={styles.userAvatarPos}>
-              <Image style={styles.usersAvatar} source={props.avatar} />
-            </View>
-          </View>
-        </LinearGradient>
-      )}
-      <View style={styles.namePos}>
-        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.storyName}>
-          {props.userName}
-        </Text>
       </View>
-    </TouchableOpacity>
-  );
-};
+    ) : (
+      <LinearGradient
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 0}}
+        locations={[0, 0.7]}
+        colors={['#D2D5F9', '#2C37E1']}
+        style={styles.usersStory}>
+        <View style={styles.avatarPos}>
+          <View style={styles.userAvatarPos}>
+            <Image style={styles.usersAvatar} source={avatar} />
+          </View>
+        </View>
+      </LinearGradient>
+    )}
+    <View style={styles.namePos}>
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.storyName}>
+        {userName}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   story: {

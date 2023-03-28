@@ -8,18 +8,23 @@ interface IContactsProps {
   onlineStatus: boolean;
 }
 
-export const UIContacts: React.FC<IContactsProps> = props => {
+export const UIContacts: React.FC<IContactsProps> = ({
+  avatar,
+  userName,
+  status,
+  onlineStatus,
+}) => {
   return (
     <View style={styles.user}>
-      <Image style={styles.avatar} source={props.avatar} />
-      {props.onlineStatus ? (
+      <Image style={styles.avatar} source={avatar} />
+      {onlineStatus && (
         <View style={styles.statusPos}>
-          <View style={styles.status}></View>
+          <View style={styles.status} />
         </View>
-      ) : null}
+      )}
       <View style={styles.userData}>
-        <Text style={styles.userName}>{props.userName}</Text>
-        <Text style={styles.userStatus}>{props.status}</Text>
+        <Text style={styles.userName}>{userName}</Text>
+        <Text style={styles.userStatus}>{status}</Text>
       </View>
     </View>
   );

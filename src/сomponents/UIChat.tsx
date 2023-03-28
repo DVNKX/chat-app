@@ -13,35 +13,43 @@ interface IChatProps {
   status: boolean;
 }
 
-export const UIChat: React.FC<IChatProps> = props => {
+export const UIChat: React.FC<IChatProps> = ({
+  avatar,
+  userName,
+  date,
+  message,
+  messageCount,
+  status,
+}) => {
   const navigation = useNavigation<NavigationProps>();
 
   const handleClickToChat = useCallback(() => {
     navigation.navigate(Routes.CHAT);
-  }, []);
+  }, [navigation]);
+
   return (
     <TouchableOpacity style={styles.user} onPress={handleClickToChat}>
-      <Image style={styles.avatar} source={props.avatar} />
-      {props.status ? (
+      <Image style={styles.avatar} source={avatar} />
+      {status ? (
         <View style={styles.statusPos}>
-          <View style={styles.status}></View>
+          <View style={styles.status} />
         </View>
       ) : null}
       <View style={styles.userData}>
         <View style={styles.chatNameDate}>
-          <Text style={styles.userName}>{props.userName}</Text>
-          <Text style={styles.messageDate}>{props.date}</Text>
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.messageDate}>{date}</Text>
         </View>
         <View style={styles.chatMessageCount}>
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
             style={styles.lastMessage}>
-            {props.message}
+            {message}
           </Text>
-          {props.messageCount ? (
+          {messageCount ? (
             <View style={styles.messageCountPos}>
-              <Text style={styles.messageCount}>{props.messageCount}</Text>
+              <Text style={styles.messageCount}>{messageCount}</Text>
             </View>
           ) : null}
         </View>

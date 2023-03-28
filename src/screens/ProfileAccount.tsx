@@ -1,121 +1,94 @@
 import {useState, useCallback} from 'react';
 import {View, Text, StyleSheet, Image, Modal, Pressable} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {UIInput} from '../Components/UIInput';
+import {UIInput} from '../сomponents/UIInput';
 import {Routes} from '../utils/routes';
 import type {NavigationProps} from '../../App';
 import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
 import {profileSchema} from '../utils/schemas';
-import {auth, storage} from '../firebase/firebase';
-import {ref} from '@firebase/storage';
-import {getDownloadURL, uploadString} from 'firebase/storage';
+import {auth} from '../firebase/firebase';
 import {ASSETS} from '../utils/assets';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {uploadProfileDataToServer} from '../services/userManagement';
+import {updateProfile, User} from 'firebase/auth';
+import {LoadingOverlay} from '../сomponents/LoadingOverlay';
+import Toast from 'react-native-toast-message';
+import {useStore} from 'react-redux';
+import {userSlice} from '../store/slices/userSlice';
+import {useAppSelector} from '../hooks/redux';
 
 export const ProfileAccount = () => {
-  const [imageBase64, setImageBase64] = useState<any>();
-  const [modalActive, setModalActive] = useState(false);
+  const [isDataUploading, setIsDataUploading] = useState<boolean>(false);
+
+  const store = useStore();
+  const userAvatar = useAppSelector(state => state.user.image);
 
   const navigation = useNavigation<NavigationProps>();
-  const handleClickToTabs = useCallback(() => {
-    navigation.navigate(Routes.TABS);
-  }, []);
+  const navigateToTabs = useCallback(() => {
+    navigation.navigate(Routes.TABS, {screen: Routes.MORE});
+  }, [navigation]);
 
   const avatar = ASSETS.defaultAvatarImage;
+
+  const showErrorToast = () => {
+    Toast.show({
+      type: 'error',
+      text1: 'Something went wrong❗️',
+      text2: 'Please, try again.',
+    });
+  };
 
   const {values, errors, isValid, handleChange, handleSubmit} = useFormik({
     initialValues: {
       name: '',
       surname: '',
     },
+
     validationSchema: profileSchema,
     validateOnChange: true,
-    onSubmit: async values => {
-      if (auth.currentUser) {
-        let photoUrl = null;
-        if (imageBase64) {
-          // const storageRef = ref(
-          //   storage,
-          //   `profile-picture/user${auth.currentUser.uid}/${auth.currentUser.uid}`,
-          // );
+    onSubmit: async submittedValues => {
+      try {
+        setIsDataUploading(true);
+        await updateProfile(auth.currentUser as User, {
+          displayName: submittedValues.name + ' ' + submittedValues.surname,
+        });
 
-          // console.log(imageBase64);
+        store.dispatch(
+          userSlice.actions.setInfo({
+            name: submittedValues.name,
+            surname: submittedValues.surname,
+            email: auth.currentUser!.email,
+          }),
+        );
 
-          // try {
-          //   await uploadString(storageRef, imageBase64, 'base64');
-          // } catch (e) {
-          //   console.error(`Upload error ${e}`);
-          // }
-
-          // try {
-          //   photoUrl = await getDownloadURL(storageRef);
-          //   console.log(`Downloaded url: ${photoUrl}`);
-          // } catch (e) {
-          //   console.error(`Download error ${e}`);
-          // }
-
-          await auth.updateCurrentUser({
-            ...auth.currentUser,
-            displayName: values.name + ' ' + values.surname,
-            photoURL: imageBase64,
-            email: auth.currentUser.email,
-          });
-        }
-        console.log('Name: ', auth.currentUser!.displayName);
-        handleClickToTabs();
+        await uploadProfileDataToServer(
+          auth.currentUser!.uid,
+          submittedValues.name + ' ' + submittedValues.surname,
+        );
+        setIsDataUploading(false);
+        navigateToTabs();
+      } catch (e) {
+        console.error(e);
+        setIsDataUploading(false);
+        showErrorToast();
       }
     },
   });
 
-  const takePhotoFromCamera = () => {
-    launchCamera({
-      mediaType: 'photo',
-      maxHeight: 100,
-      maxWidth: 100,
-      includeBase64: true,
-      cameraType: 'front',
-      quality: 0.8,
-    });
-  };
-
-  const takePhotoFromGallery = () => {
-    launchImageLibrary({
-      mediaType: 'photo',
-      maxHeight: 100,
-      maxWidth: 100,
-      includeBase64: true,
-      quality: 0.8,
-      selectionLimit: 1,
-    }).then(image => {
-      console.log(image.assets![0]);
-    });
-  };
+  const navigateToChangeAvatar = useCallback(() => {
+    navigation.navigate(Routes.CHANGE_AVATAR);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <Modal animationType="slide" transparent={true} visible={modalActive}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Pressable style={styles.modalButton} onPress={takePhotoFromCamera}>
-              <Text>Make Photo</Text>
-            </Pressable>
-            <Pressable
-              style={styles.modalButton}
-              onPress={takePhotoFromGallery}>
-              <Text>Choose photo</Text>
-            </Pressable>
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => setModalActive(!modalActive)}>
-              <Text>Hide Modal</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      <Toast position="bottom" bottomOffset={120} />
+      {isDataUploading && <LoadingOverlay />}
       <View style={styles.header}>
         <View style={styles.headerPos}>
-          <TouchableOpacity style={styles.backBtn} onPress={handleClickToTabs}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={navigateToTabs}
+            disabled={!isValid}>
             <View style={styles.chevronPos}>
               <Image style={styles.chevron} source={ASSETS.chevronLeft} />
             </View>
@@ -125,16 +98,16 @@ export const ProfileAccount = () => {
       </View>
       <View style={styles.avatarPos}>
         <View style={styles.avatar}>
-          <TouchableOpacity onPress={() => setModalActive(true)}>
+          <TouchableOpacity onPress={navigateToChangeAvatar}>
             <Image
               style={
-                ASSETS.defaultAvatarImage && imageBase64
+                ASSETS.defaultAvatarImage && userAvatar
                   ? styles.avatarImg
                   : styles.defaultAvatarImg
               }
               source={
-                imageBase64
-                  ? {uri: `data:image/jpeg;base64,${imageBase64}`}
+                userAvatar
+                  ? {uri: `data:image/jpeg;base64,${userAvatar}`}
                   : avatar
               }
             />
@@ -145,14 +118,14 @@ export const ProfileAccount = () => {
         <UIInput
           placeholder="Enter your name (Required)"
           value={values.name}
-          onChange={handleChange('name')}
+          onChangeText={handleChange('name')}
           error={errors.name}
           autoCorrect={false}
         />
         <UIInput
-          placeholder="Enter your name (Optional)"
+          placeholder="Enter your surname (Optional)"
           value={values.surname}
-          onChange={handleChange('surname')}
+          onChangeText={handleChange('surname')}
           error={errors.surname}
           autoCorrect={false}
         />
@@ -162,7 +135,7 @@ export const ProfileAccount = () => {
           disabled={!isValid}
           style={styles.saveButton}
           onPress={handleSubmit as () => void}>
-          <Text style={styles.btnText}>Save </Text>
+          <Text style={styles.btnText}>Save</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -209,6 +182,13 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 30,
     backgroundColor: '#91b3fa',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
   },
   btnText: {
     fontFamily: 'Mulish',

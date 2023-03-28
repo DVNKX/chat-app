@@ -3,14 +3,15 @@ import React, {useCallback} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import type {NavigationProps} from '../../App';
 import {ASSETS} from '../utils/assets';
+import {AppColors} from '../utils/colors';
 import {Routes} from '../utils/routes';
 
 export const Walkthrough = () => {
   const navigation = useNavigation<NavigationProps>();
 
-  const handleClickNext = useCallback(() => {
-    navigation.navigate(Routes.SIGNIN);
-  }, []);
+  const navigateToSignIn = useCallback(() => {
+    navigation.navigate(Routes.SIGN_IN);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -30,7 +31,7 @@ export const Walkthrough = () => {
             <Text style={styles.termsText}>Terms & Privacy Policy</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.startBtn} onPress={handleClickNext}>
+        <TouchableOpacity style={styles.startBtn} onPress={navigateToSignIn}>
           <Text style={styles.startText}>Start Messaging</Text>
         </TouchableOpacity>
       </View>
@@ -72,7 +73,14 @@ const styles = StyleSheet.create({
     width: 327,
     height: 52,
     borderRadius: 30,
-    backgroundColor: '#91b3fa',
+    backgroundColor: AppColors.primary,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
   },
 
   buttons: {

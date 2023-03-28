@@ -12,7 +12,7 @@ export const authSchema = Yup.object().shape({
     .matches(/\d+/, 'Password must contain number'),
 });
 
-export const profileSchema = Yup.object().shape({
+export const displayNameSchema = Yup.object().shape({
   name: Yup.string()
     .min(1, 'Name must be at least 1 characters')
     .max(16, 'Name mustn`t be more than 16 characters')

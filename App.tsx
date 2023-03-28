@@ -7,7 +7,6 @@ import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Walkthrough} from './src/screens/Walkthrough';
 import {SignIn} from './src/screens/SignIn';
 import {SignUp} from './src/screens/SignUp';
@@ -24,7 +23,7 @@ import {uploadUserOnlineStatus} from './src/services/userManagement';
 import {userSlice} from './src/store/slices/userSlice';
 import {Routes} from './src/utils/routes';
 import {SearchUser} from './src/screens/SearchUser';
-import {ChangeAvatar} from './src/screens/ChangeAvatar';
+import {CreateChat} from './src/screens/CreateChat';
 
 export type RootStackParamList = {
   Walkthrough: {name: string} | undefined;
@@ -37,7 +36,7 @@ export type RootStackParamList = {
   Chats: {name: string} | undefined;
   Chat: {name: string} | undefined;
   SearchUser: {name: string} | undefined;
-  ChangeAvatar: {name: string} | undefined;
+  CreateChat: {name: string} | undefined;
 };
 
 export type NavigationProps = StackNavigationProp<RootStackParamList>;
@@ -115,21 +114,6 @@ const App = () => {
                 options={tabsSettings}
               />
               <RootStack.Screen
-                name={Routes.CHANGE_AVATAR}
-                component={ChangeAvatar}
-                options={{
-                  presentation: 'modal',
-                  cardStyle: {
-                    marginTop: 240,
-                    marginBottom: 340,
-                    marginLeft: 40,
-                    marginRight: 40,
-                    borderRadius: 15,
-                  },
-                  headerShown: false,
-                }}
-              />
-              <RootStack.Screen
                 name={Routes.TABS}
                 component={Tabs}
                 options={tabsSettings}
@@ -138,6 +122,21 @@ const App = () => {
                 name={Routes.CHAT}
                 component={Chat}
                 options={tabsSettings}
+              />
+              <RootStack.Screen
+                name={Routes.CREATE_CHAT}
+                component={CreateChat}
+                options={{
+                  presentation: 'modal',
+                  cardStyle: {
+                    marginTop: 75,
+                    marginBottom: 350,
+                    marginLeft: 24,
+                    marginRight: 24,
+                    borderRadius: 15,
+                  },
+                  headerShown: false,
+                }}
               />
               <RootStack.Screen
                 name={Routes.SEARCH_USER}

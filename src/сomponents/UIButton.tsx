@@ -10,10 +10,17 @@ import {AppColors} from '../utils/colors';
 
 interface IButtonProps extends TouchableOpacityProps {
   text: string;
+  marginTop?: number;
+  marginBottom?: number;
 }
 
-export const UIButton: React.FC<IButtonProps> = ({text, ...props}) => (
-  <View>
+export const UIButton: React.FC<IButtonProps> = ({
+  text,
+  marginTop,
+  marginBottom,
+  ...props
+}) => (
+  <View style={{marginTop: marginTop, marginBottom: marginBottom}}>
     <TouchableOpacity {...props} style={styles.button}>
       <Text style={styles.btnText}>{text}</Text>
     </TouchableOpacity>
@@ -28,7 +35,7 @@ const styles = StyleSheet.create({
     height: 33,
     borderRadius: 30,
     backgroundColor: AppColors.primary,
-    shadowColor: '#000',
+    shadowColor: AppColors.black,
     shadowOffset: {
       width: 0,
       height: 3,

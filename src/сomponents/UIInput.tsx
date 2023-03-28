@@ -13,40 +13,46 @@ import {ASSETS} from '../utils/assets';
 
 interface IInputProps extends TextInputProps {
   error?: string;
-  securedInput?: boolean;
 }
 
-export const UIInput: React.FC<IInputProps> = ({
-  error,
-  value,
-  style,
-  securedInput,
-  ...props
-}) => {
+export const UIInput: React.FC<IInputProps> = ({error, ...props}) => {
   const [secureTextEntry, setSecureTextEntry] = useState<boolean>(true);
 
   const togglePassword = useCallback(() => {
     setSecureTextEntry(!secureTextEntry);
   }, [secureTextEntry]);
 
+  const shadowSettings = (color: string) => ({
+    shadowColor: color,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 5.65,
+  });
+
   return (
     <View style={styles.inputPad}>
       <TextInput
         {...props}
-        secureTextEntry={securedInput && secureTextEntry}
-        value={value}
-        style={[error && value ? styles.notValidInput : styles.validInput]}
+        secureTextEntry={
+          props.placeholder?.includes('password') && secureTextEntry
+        }
+        style={[
+          error !== undefined
+            ? [styles.notValidInput, shadowSettings(AppColors.error)]
+            : [styles.validInput, shadowSettings(AppColors.primary)],
+        ]}
       />
       <View>{error && <Text style={styles.error}>{error}</Text>}</View>
       {props.placeholder?.includes('password') && (
         <TouchableOpacity style={styles.passwordBtn} onPress={togglePassword}>
-          {value && (
+          {props.value && (
             <Image
               style={styles.passwordIcon}
               source={
-                secureTextEntry === true
-                  ? ASSETS.hidePassword
-                  : ASSETS.viewPasswor
+                secureTextEntry ? ASSETS.hidePassword : ASSETS.viewPasswor
               }
             />
           )}
@@ -64,6 +70,8 @@ const styles = StyleSheet.create({
     width: 327,
     height: 36,
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: AppColors.primary,
     backgroundColor: AppColors.inputFont,
     paddingLeft: 10,
     fontFamily: 'Mulish',
@@ -72,7 +80,7 @@ const styles = StyleSheet.create({
     width: 327,
     height: 36,
     borderWidth: 1,
-    borderColor: '#ed4337',
+    borderColor: AppColors.error,
     borderRadius: 5,
     backgroundColor: AppColors.inputFont,
     paddingLeft: 10,
@@ -82,7 +90,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Mulish',
     fontSize: 10,
     fontWeight: '500',
-    color: 'red',
+    color: AppColors.error,
     paddingLeft: 10,
   },
   passwordIcon: {

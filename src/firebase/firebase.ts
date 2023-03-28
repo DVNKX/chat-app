@@ -10,9 +10,10 @@ const firebaseConfig = {
   storageBucket: 'chat-app-firebase-9f913.appspot.com',
   messagingSenderId: '897686176545',
   appId: '1:897686176545:web:e4a20265e388f8ffb63460',
+  databaseURL: 'https://chat-app-firebase-9f913-default-rtdb.firebaseio.com/',
 };
 
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const db = getFirestore(app);

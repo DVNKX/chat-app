@@ -1,12 +1,12 @@
 import {useState, useCallback} from 'react';
-import {View, Text, StyleSheet, Image, Modal, Pressable} from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {UIInput} from '../сomponents/UIInput';
 import {Routes} from '../utils/routes';
 import type {NavigationProps} from '../../App';
 import {useNavigation} from '@react-navigation/native';
 import {useFormik} from 'formik';
-import {profileSchema} from '../utils/schemas';
+import {displayNameSchema} from '../utils/schemas';
 import {auth} from '../firebase/firebase';
 import {ASSETS} from '../utils/assets';
 import {uploadProfileDataToServer} from '../services/userManagement';
@@ -16,19 +16,25 @@ import Toast from 'react-native-toast-message';
 import {useStore} from 'react-redux';
 import {userSlice} from '../store/slices/userSlice';
 import {useAppSelector} from '../hooks/redux';
+import {AppColors} from '../utils/colors';
+import {AvatarModal} from '../сomponents/AvatarModal';
 
 export const ProfileAccount = () => {
+  const navigation = useNavigation<NavigationProps>();
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isDataUploading, setIsDataUploading] = useState<boolean>(false);
 
   const store = useStore();
   const userAvatar = useAppSelector(state => state.user.image);
+  const userName = auth.currentUser?.displayName?.split(' ');
 
-  const navigation = useNavigation<NavigationProps>();
+  const toggleModal = useCallback(() => {
+    setIsVisible(!isVisible);
+  }, [isVisible]);
+
   const navigateToTabs = useCallback(() => {
     navigation.navigate(Routes.TABS, {screen: Routes.MORE});
   }, [navigation]);
-
-  const avatar = ASSETS.defaultAvatarImage;
 
   const showErrorToast = () => {
     Toast.show({
@@ -44,7 +50,7 @@ export const ProfileAccount = () => {
       surname: '',
     },
 
-    validationSchema: profileSchema,
+    validationSchema: displayNameSchema,
     validateOnChange: true,
     onSubmit: async submittedValues => {
       try {
@@ -57,6 +63,13 @@ export const ProfileAccount = () => {
           userSlice.actions.setInfo({
             name: submittedValues.name,
             surname: submittedValues.surname,
+            email: auth.currentUser!.email,
+            image: userAvatar,
+          }),
+        );
+        store.dispatch(
+          userSlice.actions.setUser({
+            id: auth.currentUser!.uid,
             email: auth.currentUser!.email,
           }),
         );
@@ -75,20 +88,13 @@ export const ProfileAccount = () => {
     },
   });
 
-  const navigateToChangeAvatar = useCallback(() => {
-    navigation.navigate(Routes.CHANGE_AVATAR);
-  }, [navigation]);
-
   return (
     <View style={styles.container}>
       <Toast position="bottom" bottomOffset={120} />
       {isDataUploading && <LoadingOverlay />}
       <View style={styles.header}>
         <View style={styles.headerPos}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={navigateToTabs}
-            disabled={!isValid}>
+          <TouchableOpacity style={styles.backBtn} onPress={navigateToTabs}>
             <View style={styles.chevronPos}>
               <Image style={styles.chevron} source={ASSETS.chevronLeft} />
             </View>
@@ -98,7 +104,8 @@ export const ProfileAccount = () => {
       </View>
       <View style={styles.avatarPos}>
         <View style={styles.avatar}>
-          <TouchableOpacity onPress={navigateToChangeAvatar}>
+          <AvatarModal visble={isVisible} setVisble={toggleModal} />
+          <TouchableOpacity onPress={toggleModal}>
             <Image
               style={
                 ASSETS.defaultAvatarImage && userAvatar
@@ -106,9 +113,7 @@ export const ProfileAccount = () => {
                   : styles.defaultAvatarImg
               }
               source={
-                userAvatar
-                  ? {uri: `data:image/jpeg;base64,${userAvatar}`}
-                  : avatar
+                userAvatar ? {uri: userAvatar} : ASSETS.defaultAvatarImage
               }
             />
           </TouchableOpacity>
@@ -116,14 +121,24 @@ export const ProfileAccount = () => {
       </View>
       <View style={styles.input}>
         <UIInput
-          placeholder="Enter your name (Required)"
+          placeholderTextColor={AppColors.playceholderColor}
+          placeholder={
+            !userName || userName.length === 0
+              ? 'Enter your name (Required)'
+              : userName && userName[0]
+          }
           value={values.name}
           onChangeText={handleChange('name')}
           error={errors.name}
           autoCorrect={false}
         />
         <UIInput
-          placeholder="Enter your surname (Optional)"
+          placeholderTextColor={AppColors.playceholderColor}
+          placeholder={
+            !userName || userName.length === 0
+              ? 'Enter your surname (Optional)'
+              : userName && userName[1]
+          }
           value={values.surname}
           onChangeText={handleChange('surname')}
           error={errors.surname}
@@ -146,11 +161,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.white,
   },
   avatar: {
     borderRadius: 50,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: AppColors.inputFont,
     width: 100,
     height: 100,
     alignItems: 'center',
@@ -181,8 +196,8 @@ const styles = StyleSheet.create({
     width: 327,
     height: 46,
     borderRadius: 30,
-    backgroundColor: '#91b3fa',
-    shadowColor: '#000',
+    backgroundColor: AppColors.primary,
+    shadowColor: AppColors.black,
     shadowOffset: {
       width: 0,
       height: 3,
@@ -194,28 +209,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Mulish',
     fontWeight: '600',
     fontSize: 16,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    backgroundColor: '#fff',
-    borderRadius: 30,
-    padding: 55,
-    alignItems: 'center',
-    borderColor: '#91b3fa',
-    borderWidth: 1,
-  },
-  modalButton: {
-    borderRadius: 20,
-    padding: 10,
-    margin: 10,
-    elevation: 2,
-    backgroundColor: '#91b3fa',
-    width: 120,
-    alignItems: 'center',
   },
   header: {
     width: '100%',

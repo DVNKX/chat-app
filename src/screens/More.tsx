@@ -9,9 +9,19 @@ import {auth} from '../firebase/firebase';
 import {UIOptions} from '../сomponents/UIOptions';
 import {uploadUserOnlineStatus} from '../services/userManagement';
 import {useAppSelector} from '../hooks/redux';
+import {AppColors} from '../utils/colors';
+import {useStore} from 'react-redux';
+import {userSlice} from '../store/slices/userSlice';
 
 export const More = () => {
   const navigation = useNavigation<NavigationProps>();
+
+  const store = useStore();
+
+  const userAvatar = useAppSelector(state => state.user.image);
+  const id = useAppSelector(state => state.user.id);
+  const name = auth.currentUser?.displayName;
+  const email = auth.currentUser?.email;
 
   const handleClickToProfile = useCallback(() => {
     navigation.navigate(Routes.PROFILE_ACCOUNT);
@@ -26,78 +36,79 @@ export const More = () => {
   }, [navigation]);
 
   const handleClickToSignOut = useCallback(async () => {
-    await uploadUserOnlineStatus(auth.currentUser!.uid, false);
+    await uploadUserOnlineStatus(id, false);
+    store.dispatch(userSlice.actions.logOut());
     await auth.signOut().catch(e => {
       Alert.alert(e);
     });
     navigation.navigate(Routes.WALKTHROUGH);
   }, [navigation]);
 
-  const {name, surname} = useAppSelector(state => state.user);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>More</Text>
+        <Text style={[styles.text, {fontSize: 16}]}>More</Text>
       </View>
-      <View>
-        <View style={styles.profileContent}>
-          <View style={styles.profileButtonPos}>
-            <TouchableOpacity
-              onPress={handleClickToProfile}
-              style={styles.profileButton}>
-              <View style={styles.avatarPos}>
-                <Image
-                  style={styles.profileAvatar}
-                  source={ASSETS.defaultAvatarImage}
-                />
-              </View>
-              <View style={styles.userData}>
-                <View style={styles.namePos}>
-                  <Text style={styles.text}>
-                    {name === null
-                      ? auth.currentUser?.displayName
-                      : name + ' ' + surname}
-                  </Text>
-                </View>
-                <Text style={styles.userEmail}>{auth.currentUser?.email}</Text>
-              </View>
-              <View style={styles.chevronPos}>
-                <Image style={styles.chevron} source={ASSETS.chevronRight} />
-              </View>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.profileContent}>
+        <View style={styles.profileBtnPos}>
+          <TouchableOpacity
+            onPress={handleClickToProfile}
+            style={styles.profileBtn}>
+            <View style={styles.avatarPos}>
+              <Image
+                style={
+                  userAvatar
+                    ? styles.profileAvatar
+                    : styles.defaultProfileAvatar
+                }
+                source={
+                  userAvatar ? {uri: userAvatar} : ASSETS.defaultAvatarImage
+                }
+              />
+            </View>
+            <View style={styles.userData}>
+              <Text style={[styles.text, {paddingBottom: 2}]}>{name}</Text>
+              <Text
+                style={[
+                  styles.text,
+                  {fontWeight: '400', fontSize: 12, opacity: 0.5},
+                ]}>
+                {email}
+              </Text>
+            </View>
+            <View style={styles.chevronPos}>
+              <Image style={styles.chevron} source={ASSETS.chevronRight} />
+            </View>
+          </TouchableOpacity>
         </View>
-        <View style={styles.tabsContent}>
-          <UIOptions
-            navigate={handleClickToContacts}
-            icon={ASSETS.avatar}
-            text={'Account'}
-          />
-          <UIOptions
-            navigate={handleClickToChats}
-            icon={ASSETS.chats}
-            text={'Chats'}
-          />
-        </View>
-        <View style={styles.optionsContent}>
-          <UIOptions icon={ASSETS.appereance} text={'Appearence'} />
-          <UIOptions icon={ASSETS.notifications} text={'Notifications'} />
-          <UIOptions icon={ASSETS.privacy} text={'Privacy'} />
-          <UIOptions icon={ASSETS.data} text={'Data Usage'} />
-        </View>
-        <View style={styles.borderPos}>
-          <View style={styles.border} />
-        </View>
-        <View style={styles.tabsContent}>
-          <UIOptions icon={ASSETS.help} text={'Help'} />
-          <UIOptions icon={ASSETS.message} text={'Invite your friends'} />
-          <UIOptions
-            icon={ASSETS.signOut}
-            text={'Sign Out'}
-            navigate={handleClickToSignOut}
-          />
-        </View>
+      </View>
+      <View style={styles.tabsContent}>
+        <UIOptions
+          action={handleClickToContacts}
+          icon={ASSETS.avatar}
+          optionTitle={'Contacts'}
+        />
+        <UIOptions
+          action={handleClickToChats}
+          icon={ASSETS.chats}
+          optionTitle={'Chats'}
+        />
+      </View>
+      <View style={styles.optionsContent}>
+        <UIOptions icon={ASSETS.appereance} optionTitle={'Appearence'} />
+        <UIOptions icon={ASSETS.notifications} optionTitle={'Notifications'} />
+        <UIOptions icon={ASSETS.privacy} optionTitle={'Privacy'} />
+        <UIOptions icon={ASSETS.data} optionTitle={'Data Usage'} />
+      </View>
+      <View style={styles.border} />
+      <View style={styles.tabsContent}>
+        <UIOptions icon={ASSETS.help} optionTitle={'Help'} />
+        <UIOptions icon={ASSETS.message} optionTitle={'Invite your friends'} />
+        <UIOptions
+          icon={ASSETS.signOut}
+          optionTitle={'Sign Out'}
+          action={handleClickToSignOut}
+        />
       </View>
     </View>
   );
@@ -108,32 +119,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.white,
   },
   header: {
-    justifyContent: 'flex-start',
     flexDirection: 'row',
     paddingTop: 57,
     paddingLeft: 24,
     paddingRight: 24,
     paddingBottom: 13,
   },
-  headerText: {
-    fontFamily: 'Mulish',
-    fontWeight: '600',
-    fontSize: 16,
-  },
   profileContent: {
-    alignItems: 'center',
     width: 375,
     height: 66,
   },
-  profileButton: {
+  profileBtn: {
     width: 343,
     height: 50,
     flexDirection: 'row',
   },
-  profileButtonPos: {
+  profileBtnPos: {
     paddingBottom: 8,
     paddingTop: 8,
     paddingLeft: 16,
@@ -141,27 +145,23 @@ const styles = StyleSheet.create({
   },
   avatarPos: {
     borderRadius: 50,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: AppColors.inputFont,
     width: 50,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  profileAvatar: {
+  defaultProfileAvatar: {
     width: 24,
     height: 24,
   },
+  profileAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+  },
   userData: {
     paddingLeft: 20,
-  },
-  namePos: {
-    paddingBottom: 2,
-  },
-  userEmail: {
-    fontFamily: 'Mulish',
-    fontWeight: '400',
-    fontSize: 12,
-    opacity: 0.5,
   },
   chevron: {
     width: 7.42,
@@ -185,14 +185,11 @@ const styles = StyleSheet.create({
     height: 204,
   },
   border: {
-    width: 342,
-    justifyContent: 'center',
+    marginLeft: 25,
+    width: 350,
     borderWidth: 1,
-    borderColor: '#EDEDED',
-  },
-  borderPos: {
-    paddingTop: 8,
-    paddingBottom: 8,
-    alignItems: 'center',
+    borderColor: AppColors.primaryBorder,
+    marginTop: 8,
+    marginBottom: 8,
   },
 });

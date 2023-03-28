@@ -13,9 +13,8 @@ import {uploadEmailToServer} from '../services/userManagement';
 import {LoadingOverlay} from '../сomponents/LoadingOverlay';
 import {AppColors} from '../utils/colors';
 
-export const SignUp: React.FC = () => {
+export const SignUp = () => {
   const navigation = useNavigation<NavigationProps>();
-
   const [isUserSigningUp, setIsUserSigningUp] = useState<boolean>(false);
 
   const navigateToProfile = useCallback(() => {
@@ -34,7 +33,7 @@ export const SignUp: React.FC = () => {
         setIsUserSigningUp(true);
         await createUserWithEmailAndPassword(
           auth,
-          submittedValues.email,
+          submittedValues.email.toLowerCase(),
           submittedValues.password,
         );
         await uploadEmailToServer(auth.currentUser!.uid, submittedValues.email);
@@ -44,6 +43,7 @@ export const SignUp: React.FC = () => {
       } catch (e: any) {
         if (e.code.includes('auth/email-already-in-use')) {
           Alert.alert('Email already in use');
+          setIsUserSigningUp(false);
         }
       }
     },
@@ -53,11 +53,12 @@ export const SignUp: React.FC = () => {
     <View style={styles.container}>
       {isUserSigningUp && <LoadingOverlay />}
       <View style={styles.textPos}>
-        <Text style={styles.signUpText}>Sign up</Text>
+        <Text style={styles.headerText}>Sign up</Text>
       </View>
       <View style={styles.input}>
         <UIInput
           placeholder={'Enter your email'}
+          placeholderTextColor={AppColors.playceholderColor}
           keyboardType={'email-address'}
           value={values.email}
           onChangeText={handleChange('email')}
@@ -67,11 +68,11 @@ export const SignUp: React.FC = () => {
         />
         <UIInput
           placeholder={'Enter your password'}
+          placeholderTextColor={AppColors.playceholderColor}
           value={values.password}
           onChangeText={handleChange('password')}
           error={errors.password}
           autoCorrect={false}
-          securedInput
         />
       </View>
       <View style={styles.btnPos}>
@@ -79,7 +80,7 @@ export const SignUp: React.FC = () => {
           style={styles.signUpButton}
           onPress={handleSubmit as () => void}
           disabled={!isValid}>
-          <Text style={styles.btnText}>Sign up</Text>
+          <Text style={styles.text}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -91,17 +92,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.white,
   },
   input: {
     paddingTop: 95,
     paddingLeft: 20,
     paddingRight: 20,
   },
-  btnText: {
+  text: {
     fontFamily: 'Mulish',
     fontWeight: '600',
     fontSize: 16,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   btnPos: {
     paddingTop: 274,
@@ -113,7 +119,7 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 30,
     backgroundColor: AppColors.primary,
-    shadowColor: '#000',
+    shadowColor: AppColors.black,
     shadowOffset: {
       width: 0,
       height: 3,
@@ -124,11 +130,5 @@ const styles = StyleSheet.create({
   textPos: {
     paddingTop: 79,
     paddingBottom: 5,
-  },
-  signUpText: {
-    fontFamily: 'Mulish',
-    fontSize: 24,
-    fontWeight: '700',
-    textAlign: 'center',
   },
 });

@@ -1,45 +1,63 @@
 import React from 'react';
-import {ImageSourcePropType} from 'react-native';
+import {Alert, ImageSourcePropType} from 'react-native';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ASSETS} from '../utils/assets';
 
 interface IOptionsProps {
-  navigate?: () => void;
+  action?: () => void;
   icon: ImageSourcePropType;
-  text: string;
+  optionTitle: string;
 }
 
-export const UIOptions: React.FC<IOptionsProps> = ({navigate, icon, text}) => (
-  <View style={styles.tabsPos}>
-    <TouchableOpacity style={styles.tabsButton} onPress={navigate}>
-      <View style={styles.iconPos}>
-        <Image style={styles.icon} source={icon} />
-      </View>
-      <View style={styles.textPos}>
-        <Text style={styles.text}>{text}</Text>
-      </View>
-      <View style={styles.chevronPos}>
-        <Image style={styles.chevron} source={ASSETS.chevronRight} />
-      </View>
-    </TouchableOpacity>
-  </View>
-);
+export const UIOptions: React.FC<IOptionsProps> = ({
+  action,
+  icon,
+  optionTitle,
+}) => {
+  const plugWarning = () => {
+    Alert.alert(
+      'Warning',
+      `This is plug button. ${optionTitle} will be release in future updates!`,
+      [{text: 'Got it.'}],
+    );
+  };
+
+  return (
+    <View style={styles.tabsPos}>
+      <TouchableOpacity
+        style={styles.tabsButton}
+        onPress={action ? action : plugWarning}>
+        <View style={styles.contentPos}>
+          <Image style={styles.icon} source={icon} />
+        </View>
+        <View style={[styles.contentPos, {paddingLeft: 6}]}>
+          <Text style={styles.text}>{optionTitle}</Text>
+        </View>
+        <View style={styles.chevronPos}>
+          <Image style={styles.chevron} source={ASSETS.chevronRight} />
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
+  tabsPos: {
+    marginTop: 8,
+    marginLeft: 16,
+    marginRight: 16,
+  },
   tabsButton: {
     width: 343,
     height: 40,
     flexDirection: 'row',
   },
-  iconPos: {
+  contentPos: {
     justifyContent: 'center',
   },
   icon: {
     width: 17,
     height: 17,
-  },
-  textPos: {
-    paddingLeft: 6,
     justifyContent: 'center',
   },
   text: {
@@ -48,16 +66,11 @@ const styles = StyleSheet.create({
   },
   chevronPos: {
     position: 'absolute',
-    paddingTop: 15,
-    paddingLeft: 320,
+    marginTop: 15,
+    marginLeft: 320,
   },
   chevron: {
     width: 7.42,
     height: 12.02,
-  },
-  tabsPos: {
-    paddingTop: 8,
-    paddingLeft: 16,
-    paddingRight: 16,
   },
 });

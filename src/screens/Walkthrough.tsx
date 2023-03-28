@@ -1,13 +1,26 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import type {NavigationProps} from '../../App';
 import {ASSETS} from '../utils/assets';
 import {AppColors} from '../utils/colors';
 import {Routes} from '../utils/routes';
+import {PrivacyPolicyModal} from '../сomponents/PrivacyPolicyModal';
 
 export const Walkthrough = () => {
   const navigation = useNavigation<NavigationProps>();
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  const toggleModal = useCallback(() => {
+    setIsVisible(!isVisible);
+  }, [isVisible]);
 
   const navigateToSignIn = useCallback(() => {
     navigation.navigate(Routes.SIGN_IN);
@@ -15,24 +28,24 @@ export const Walkthrough = () => {
 
   return (
     <View style={styles.container}>
-      <View>
-        <View style={styles.imagePos}>
-          <Image style={styles.startImg} source={ASSETS.walkthroughImage} />
-        </View>
-        <View style={styles.textPos}>
-          <Text style={styles.text}>
-            Connect easily with your family and friends over countries
-          </Text>
-        </View>
+      <View style={styles.imagePos}>
+        <Image style={styles.startImg} source={ASSETS.walkthroughImage} />
+        <Text style={styles.headerText}>
+          Connect easily with your family and friends over countries
+        </Text>
       </View>
-      <View style={styles.buttons}>
-        <View style={styles.termsPos}>
-          <TouchableOpacity style={styles.termsBtn}>
-            <Text style={styles.termsText}>Terms & Privacy Policy</Text>
-          </TouchableOpacity>
-        </View>
+      <View
+        style={
+          Platform.OS.includes('android')
+            ? [styles.buttons, {paddingTop: 140}]
+            : styles.buttons
+        }>
+        <TouchableOpacity style={styles.termsBtn} onPress={toggleModal}>
+          <Text style={styles.text}>Terms & Privacy Policy</Text>
+        </TouchableOpacity>
+        <PrivacyPolicyModal isVisible={isVisible} setIsVisible={toggleModal} />
         <TouchableOpacity style={styles.startBtn} onPress={navigateToSignIn}>
-          <Text style={styles.startText}>Start Messaging</Text>
+          <Text style={[styles.text, {fontSize: 16}]}>Start Messaging</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -44,28 +57,23 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.white,
   },
   text: {
+    fontFamily: 'Mulish',
+  },
+  headerText: {
     color: '#0F1828',
     fontWeight: '700',
     fontSize: 24,
-    fontFamily: 'Mulish',
     textAlign: 'center',
-  },
-  textPos: {
-    paddingBottom: 42,
-    paddingLeft: 47,
-    paddingRight: 48,
   },
   termsBtn: {
     alignItems: 'center',
     justifyContent: 'center',
     width: 148,
     height: 24,
-  },
-  termsPos: {
-    paddingBottom: 18,
+    marginBottom: 20,
   },
   startBtn: {
     alignItems: 'center',
@@ -74,7 +82,7 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 30,
     backgroundColor: AppColors.primary,
-    shadowColor: '#000',
+    shadowColor: AppColors.black,
     shadowOffset: {
       width: 0,
       height: 3,
@@ -82,9 +90,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.29,
     shadowRadius: 4.65,
   },
-
   buttons: {
-    paddingTop: 126,
+    paddingTop: 186,
     alignItems: 'center',
   },
   startImg: {
@@ -95,13 +102,5 @@ const styles = StyleSheet.create({
     paddingTop: 135,
     paddingLeft: 51,
     paddingRight: 51,
-  },
-  termsText: {
-    fontFamily: 'Mulish',
-    fontSize: 14,
-  },
-  startText: {
-    fontFamily: 'Mulish',
-    fontSize: 16,
   },
 });

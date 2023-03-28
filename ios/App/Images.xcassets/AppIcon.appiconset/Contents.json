@@ -1,46 +1,61 @@
 {
   "images" : [
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-20@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-20@3x.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-29.png",
+      "idiom" : "iphone",
+      "scale" : "1x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-29@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-29@3x.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-40@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-40@3x.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "40x40"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-60@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-60@3x.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
+      "filename" : "DVNKX_vector_lines_minimalistic_chat_app_logo_a_little_bit_shad_2d84933f-34e8-4743-aedd-84e9c222f902-1024.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"

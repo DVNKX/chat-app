@@ -1,19 +1,19 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 export interface IUserStore {
-  email: null;
-  id: null;
-  name: null;
-  surname?: null;
-  image?: null;
+  email: string;
+  id: string;
+  name: string;
+  surname: string;
+  image?: string;
 }
 
 const initialState: IUserStore = {
-  email: null,
-  id: null,
-  name: null,
-  surname: null,
-  image: null,
+  email: '',
+  id: '',
+  name: '',
+  surname: '',
+  image: '',
 };
 
 export const userSlice = createSlice({
@@ -30,12 +30,15 @@ export const userSlice = createSlice({
       state.email = action.payload.email;
       state.image = action.payload.image;
     },
+    deleteImage(state) {
+      state.image = '';
+    },
     logOut(state) {
-      state.email = null;
-      state.id = null;
-      state.name = null;
-      state.surname = null;
-      state.image = null;
+      state.email = '';
+      state.id = '';
+      state.name = '';
+      state.surname = '';
+      state.image = '';
     },
   },
 });

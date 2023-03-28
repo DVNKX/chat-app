@@ -12,4 +12,5 @@ export enum Routes {
 
   SEARCH_USER = 'SearchUser',
   CHANGE_AVATAR = 'ChangeAvatar',
+  CREATE_CHAT = 'CreateChat',
 }

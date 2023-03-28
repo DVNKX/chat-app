@@ -1,6 +1,14 @@
 import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import {AppColors} from '../utils/colors';
 
 interface IStoryProps {
   avatar: any;
@@ -15,12 +23,10 @@ export const UIStory: React.FC<IStoryProps> = ({
 }) => (
   <TouchableOpacity style={styles.story}>
     {isViewed ? (
-      <View>
-        <View style={styles.userStory}>
-          <View style={styles.avatarPos}>
-            <View style={styles.userAvatarPos}>
-              <Image style={styles.usersAvatar} source={avatar} />
-            </View>
+      <View style={styles.userStory}>
+        <View style={styles.avatarPos}>
+          <View style={styles.userAvatarPos}>
+            <Image style={styles.usersAvatar} source={avatar} />
           </View>
         </View>
       </View>
@@ -29,7 +35,7 @@ export const UIStory: React.FC<IStoryProps> = ({
         start={{x: 0, y: 0}}
         end={{x: 1, y: 0}}
         locations={[0, 0.7]}
-        colors={['#D2D5F9', '#2C37E1']}
+        colors={[AppColors.storyBorder, AppColors.activeStory]}
         style={styles.usersStory}>
         <View style={styles.avatarPos}>
           <View style={styles.userAvatarPos}>
@@ -48,7 +54,7 @@ export const UIStory: React.FC<IStoryProps> = ({
 
 const styles = StyleSheet.create({
   story: {
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.white,
     paddingRight: 16,
   },
   usersStory: {
@@ -68,16 +74,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 48,
     height: 48,
-    backgroundColor: '#F7F7FC',
+    backgroundColor: AppColors.storyBorder,
     borderRadius: 16,
   },
   usersAvatar: {
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: '#000',
+    backgroundColor: AppColors.black,
     borderWidth: 3,
-    borderColor: '#fff',
+    borderColor: AppColors.white,
   },
   namePos: {
     paddingTop: 4,
@@ -93,7 +99,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderWidth: 1,
-    borderColor: '#ADB5BD',
+    borderColor: AppColors.storyBorder,
     borderRadius: 16,
   },
 });

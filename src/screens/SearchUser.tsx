@@ -6,26 +6,29 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useDebounce} from 'use-debounce';
 import {NavigationProps} from '../../App';
 import {auth} from '../firebase/firebase';
+import {useAppSelector} from '../hooks/redux';
+import {chatsColRef, createChatAtDatabase} from '../services/chatManagment';
 import {uploadContactToServer, usersColRef} from '../services/userManagement';
-import {ASSETS} from '../utils/assets';
 import {AppColors} from '../utils/colors';
 import {UIButton} from '../сomponents/UIButton';
 import {UIContacts} from '../сomponents/UIContacts';
 import {UISearchInput} from '../сomponents/UISearchInput';
 
 export const SearchUser = () => {
-  const [text, setText] = useState<string>('');
-  const [user, setUser] = useState<DocumentData>();
-  const [debouncedText] = useDebounce(text, 500);
-
   const navigation = useNavigation<NavigationProps>();
+  const [text, setText] = useState<string>('');
+  const [debouncedText] = useDebounce(text, 500);
+  const [user, setUser] = useState<DocumentData>();
+
+  const id = useAppSelector(state => state.user.id);
+  const name = auth.currentUser!.displayName;
 
   const navigateToContacts = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
 
   const getUser = async (search: string) => {
-    const email = auth.currentUser?.email;
+    const email = auth.currentUser!.email;
     try {
       const q = query(
         usersColRef,
@@ -40,33 +43,54 @@ export const SearchUser = () => {
     }
   };
 
-  useEffect(() => {
-    if (debouncedText) {
-      getUser(text);
-    } else {
-      setUser(undefined);
-    }
-  }, [debouncedText]);
-
   const addToContacts = async () => {
+    const chatId = Math.random().toString(20).slice(2);
+    const members: string[] = [id, user && user.id];
+    const chatName: string[] = [name, user && user.name];
     try {
-      uploadContactToServer(auth.currentUser!.uid, user!);
+      const q = query(
+        chatsColRef,
+        where('members', 'array-contains', id && user && user.id),
+
+        where('type', '==', 'private chat'),
+      );
+      const qs = await getDocs(q);
+      uploadContactToServer(id, user && user.id);
+      if (qs.docs.map(d => !d.exists())) {
+        createChatAtDatabase(id, chatId, members, chatName);
+      }
       navigateToContacts();
     } catch (e) {
       console.error(e);
     }
   };
 
+  useEffect(() => {
+    if (debouncedText) {
+      getUser(debouncedText);
+    } else {
+      setUser(undefined);
+    }
+  }, [debouncedText]);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText1}>
-          Enter name of user which you want to find
+          Enter email of user which you want to find
         </Text>
-        <Text style={styles.headerText2}>or write his email</Text>
       </View>
       <View style={styles.input}>
-        <UISearchInput placeholder="Email" value={text} onChange={setText} />
+        <UISearchInput
+          focusable={true}
+          placeholder={'Email'}
+          placeholderTextColor={AppColors.playceholderColor}
+          fontColor={AppColors.inputFont}
+          value={text}
+          onChangeText={setText}
+          autoCapitalize={'none'}
+          autoCorrect={false}
+        />
       </View>
       <View style={styles.scrollPos}>
         <ScrollView style={styles.scroll}>
@@ -75,21 +99,21 @@ export const SearchUser = () => {
               <UIContacts
                 userName={user.name}
                 onlineStatus={user.onlineStatus}
-                status={user.onlineStatus === true ? 'Online' : 'Offline'}
-                avatar={ASSETS.defaultAvatarImage}
+                avatar={user.avatar}
               />
             </View>
           )}
         </ScrollView>
       </View>
-      <View style={styles.buttons}>
+      <View style={styles.navButton}>
         <UIButton onPress={navigateToContacts} text={'Back'} />
       </View>
-      {user === undefined || text === '' ? null : (
-        <View style={styles.addButton}>
-          <UIButton onPress={addToContacts} text={'Add to contact'} />
-        </View>
-      )}
+      {user === undefined ||
+        (text !== '' && (
+          <View style={styles.addButton}>
+            <UIButton onPress={addToContacts} text={'Add to contact'} />
+          </View>
+        ))}
     </View>
   );
 };
@@ -113,14 +137,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     textAlign: 'center',
   },
-  headerText2: {
-    paddingTop: 10,
-    fontFamily: 'Mulish',
-    fontWeight: '600',
-    fontSize: 13,
-  },
   input: {padding: 10},
-  buttons: {
+  navButton: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     padding: 15,
